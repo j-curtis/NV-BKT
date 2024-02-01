@@ -18,17 +18,20 @@ figDirectory = "../figures/AL/"
 def compute():
 
 	### Integration parameters
-	xmax = 10.
-	umax = 120.
+	xmax = 5.
+	#umax = 120.
+	vmax = 100.
 	
 	###	Plot parameters
-	numrs = 30
-	rmin = 1.e-7
-	rmax = 1.e-1
-	### We avoid exactly the critical point
+	numrs = 20
+	rmin = 1.e-3
+	rmax = 1.
+	### We avoid getting too close to the critical point
 	rs = np.geomspace(rmin,rmax,numrs)
+	#rs = np.array([1.e-3,3.e-3,5.e-3,1.e-2,3.e-2,5.e-2,1.e-1,3.e-1,5.e-1,1.e0])
+	#numrs = len(rs)
 
-	zs = np.array([1.,3.,5.,10.,30.,50.,100.,300.,500.,1000.,3000.,5000.])
+	zs = np.array([1.,3.,5.,10.,30.,50.,100.,300.])
 	numzs = len(zs)
 
 	noise = np.zeros((numrs,numzs))
@@ -40,13 +43,18 @@ def compute():
 		for nz in range(numzs):
 			z = zs[nz]
 
-			def integrand(x,u):
+			#def integrand(x,u):
+			def integrand(x,v):
 				"""Integrand in AL noise formula"""
-				return np.exp(-4.*x*z)/x *( (x**2 + u**2 + r) - np.sqrt( ( (x+u)**2 + r )*( (x-u)**2 + r ) ) )/( (x**2 + u**2 + r)**2 )
+				return .5*(1.+r)**2*np.exp(-4.*x*z)/x *( (x**2 + v + r) - np.sqrt( v**2 + (x**2 + r)**2 + 2.*(r - x**2)*v ) )/( (x**2 + v + r)**2 )
+
+				#return (1.+r)**2*np.exp(-4.*x*z)/x *( (x**2 + u**2 + r) - np.sqrt( ( (x+u)**2 + r )*( (x-u)**2 + r ) ) )/( (x**2 + u**2 + r)**2 )
 
 
 
-			noise[nr,nz], noise_err[nr,nz] = intg.dblquad(integrand, 0.,umax,0.,rmax)
+			#noise[nr,nz], noise_err[nr,nz] = intg.dblquad(integrand, 0.,umax,0.,xmax)
+			noise[nr,nz], noise_err[nr,nz] = intg.dblquad(integrand, 0.,vmax,0.,xmax)
+
 
 	np.save(dataDirectory+"noise.npy",noise)
 	np.save(dataDirectory+"noise_err.npy",noise_err)
@@ -71,7 +79,7 @@ def anaylyze(saveFig):
 	noise = np.load(dataDirectory+"noise.npy")
 	noise_err = np.load(dataDirectory+"noise_err.npy")
 
-	zindxs = [0,3,5,6,7]
+	zindxs = [3,4,6,7]
 	cs = cm.gist_heat(np.linspace(0.8,0.,len(zindxs)))
 
 	i = 0
@@ -90,7 +98,7 @@ def anaylyze(saveFig):
 
 	plt.show()
 
-	rindxs = [8,14,20,24,28]
+	rindxs = [0,6,12,19]
 	cs = cm.coolwarm(np.linspace(0.55,1.,len(rindxs)))
 
 	i = 0
@@ -110,7 +118,7 @@ def anaylyze(saveFig):
 	plt.show()
 
 def main():
-	saveFig = False
+	saveFig = True
 	calc = False
 
 	if calc:
