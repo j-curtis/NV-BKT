@@ -18,9 +18,8 @@ figDirectory = "../figures/AL/"
 def compute():
 
 	### Integration parameters
-	xmax = 5.
-	#umax = 120.
-	vmax = 100.
+	xmax = 6.
+	vmax = 150.
 	
 	###	Plot parameters
 	numrs = 20
@@ -46,7 +45,7 @@ def compute():
 			#def integrand(x,u):
 			def integrand(x,v):
 				"""Integrand in AL noise formula"""
-				return .5*(1.+r)**2*np.exp(-4.*x*z)/x *( (x**2 + v + r) - np.sqrt( v**2 + (x**2 + r)**2 + 2.*(r - x**2)*v ) )/( (x**2 + v + r)**2 )
+				return .5*(1.+r)**2*np.exp(-4.*x*z)/x *( (x**2 + v + r) - np.sqrt( (x**2 + r + v)**2 - 4.*v*x**2 ) )/( (x**2 + v + r)**2 )
 
 				#return (1.+r)**2*np.exp(-4.*x*z)/x *( (x**2 + u**2 + r) - np.sqrt( ( (x+u)**2 + r )*( (x-u)**2 + r ) ) )/( (x**2 + u**2 + r)**2 )
 
@@ -119,7 +118,7 @@ def anaylyze(saveFig):
 
 def main():
 	saveFig = True
-	calc = False
+	calc = True
 
 	if calc:
 		compute()
