@@ -83,7 +83,7 @@ def anaylyze(saveFig):
 
 	i = 0
 	for zindx in zindxs:
-		plt.plot(rs,noise[:,zindx],color=cs[i],label=r'$z = $'+"{z:0.0f}".format(z=zs[zindx])+r'$\xi_0$' )
+		plt.plot(rs,noise[:,zindx],color=cs[i],label=r'$z = $'+"{z:0.0f}".format(z=zs[zindx])+r'$\tilde{\xi}_{\rm BCS}$' )
 		i+=1
 
 	plt.legend()
@@ -106,7 +106,7 @@ def anaylyze(saveFig):
 		i+=1
 
 	plt.legend()
-	plt.xlabel(r'$z/\xi_0$')
+	plt.xlabel(r'$z/\tilde{\xi}_{\rm BCS}$')
 	plt.ylabel(r'$\mathcal{N}_{zz}/\mathcal{N}_0^{\rm AL}$')
 	plt.yscale('log')
 	plt.xscale('log')

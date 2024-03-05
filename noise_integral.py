@@ -122,14 +122,15 @@ def TBKTFit():
 
 
 ### Main routine for computing 
-def main():
+def main(normalizeTBKT = False):
 	print("numrgsteps: "+str(numrgsteps))
 	print("lmax: "+str(lmax))
 
-	### Parameters which pertain to vortex dynamics
-	RN = 0.3 ### kOhm
-	RQ = 25.8 ### kOhm
-	muv = 4.*RN/RQ ### Bardeen Stephens vortex mobility in terms of RN
+	### We use units where muv = 1
+	#RN = 0.3 ### kOhm
+	#RQ = 25.8 ### kOhm
+	#muv = 4.*RN/RQ ### Bardeen Stephens vortex mobility in terms of RN
+	muv = 1.
 	print("muv: "+str(muv))
 
 	### Momentum parameters
@@ -142,16 +143,24 @@ def main():
 	qs = np.geomspace(qmin,qmax,numqs)
 	np.save(dataDirectory+"qs.npy",qs)
 
+	### Extract true transition temperature
+	TBKT, TBKT_sigma, r = TBKTFit()
+
+	epsc = 1./TBKT
+
 	### Frequency parameters
 	### Frequencies relative to diffusive frequency scale on log scale
-	#numws = 10 
-	ws = muv*np.array([1.e-25,1.e-8, 3.e-8, 1.e-7, 3.e-7, 1.e-6, 3.e-6, 1.e-5, 3.e-5, 1.e-4, 1.e-3, 1.e-2, 1.e-1, 1.])
+	### If chosen, we will normalize according to the renormalized, physical BKT transition temperature
+	### This means that w_0 = muv * T_BKT * xi_0^-2 = TBKT in chosen units
+	if normalizeTBKT:
+		ws = muv*TBKT*np.array([1.e-25,1.e-8, 3.e-8, 1.e-7, 3.e-7, 1.e-6, 3.e-6, 1.e-5, 3.e-5, 1.e-4, 1.e-3, 1.e-2, 1.e-1, 1.])	
+
+	else:
+		ws = muv*np.array([1.e-25,1.e-8, 3.e-8, 1.e-7, 3.e-7, 1.e-6, 3.e-6, 1.e-5, 3.e-5, 1.e-4, 1.e-3, 1.e-2, 1.e-1, 1.])	
+
 	numws = len(ws)
 	print("numws: "+str(numws))
 	np.save(dataDirectory+"ws.npy",ws)
-
-	### Extract true transition temperature
-	TBKT, TBKT_sigma, r = TBKTFit()
 
 	### Temperature parameters
 	numtemps = 40
@@ -222,6 +231,9 @@ def main():
 
 			noise[nt,nz,:] = np.trapz(noisekernel*np.imag(1./eps_qw[nt,:,:]),qs,axis=0)
 
+	if normalizeTBKT:
+		noisekernel *= epsc
+
 
 	t1 = time.time()
 
@@ -245,7 +257,7 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+	main(True)
 
 
 
